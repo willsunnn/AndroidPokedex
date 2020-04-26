@@ -11,7 +11,7 @@ public class PokemonListModel {
                 1, "Bulbasaur",
                 new PokemonType[]{
                         new PokemonType("grass", "insert url here"),
-                        new PokemonType("water", "insert url here"),
+                        new PokemonType("poison", "insert url here"),
                 }));
         pokemons.add(new PokemonModel(
                 4, "Charmander",

@@ -20,10 +20,12 @@ public class PokemonListAdapter
 
     private PokemonListModel pokemon;
     private PokemonListModel filteredPokemon;
+    private OnPokemonClickListener pokemonClickListener;
 
-    public PokemonListAdapter(PokemonListModel pokemon) {
+    public PokemonListAdapter(PokemonListModel pokemon, OnPokemonClickListener pokemonClickListener) {
         this.pokemon = pokemon;
         this.filteredPokemon = pokemon;
+        this.pokemonClickListener = pokemonClickListener;
     }
 
     @NonNull
@@ -33,13 +35,13 @@ public class PokemonListAdapter
         LayoutInflater inflater = LayoutInflater.from(context);
 
         View pokemonView = inflater.inflate(R.layout.pokemon_list_subview, parent, false);
-        return new PokemonViewHolder(pokemonView);
+        return new PokemonViewHolder(pokemonView, this.pokemonClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         PokemonModel poke = filteredPokemon.getPokemonAtIndex(position);
-        holder.spriteView.setImageResource(poke.getSprite());
+        holder.spriteView.setImageResource(poke.getFrontSprite());
         holder.nameView.setText("Name: "+poke.getName());
         holder.levelView.setText("Level "+Integer.toString(poke.getLevel()));
         holder.typeView.setText("Types: "+poke.getTypesAsString());
@@ -75,19 +77,34 @@ public class PokemonListAdapter
         };
     }
 
-    public class PokemonViewHolder extends RecyclerView.ViewHolder {
+    public class PokemonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        OnPokemonClickListener pokemonClickListener;
+
         ImageView spriteView;
         TextView nameView;
         TextView levelView;
         TextView typeView;
 
-        public PokemonViewHolder(@NonNull View itemView) {
+        public PokemonViewHolder(@NonNull View itemView, OnPokemonClickListener pokemonClickListener) {
             super(itemView);
             spriteView = itemView.findViewById(R.id.SpriteView);
             nameView = itemView.findViewById(R.id.NameView);
             levelView = itemView.findViewById(R.id.LevelView);
             typeView = itemView.findViewById(R.id.TypeView);
+
+            this.pokemonClickListener = pokemonClickListener;
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            PokemonModel poke = filteredPokemon.getPokemonAtIndex(getAdapterPosition());
+            this.pokemonClickListener.onPokemonClick(poke);
+        }
+    }
+
+    public interface OnPokemonClickListener {
+        void onPokemonClick(PokemonModel pokemon);
     }
 
 }

@@ -6,11 +6,13 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.SearchView;
 
-public class PokemonListActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class PokemonListActivity extends AppCompatActivity
+        implements SearchView.OnQueryTextListener,  PokemonListAdapter.OnPokemonClickListener {
     PokemonListAdapter adapter;
     RecyclerView recyclerView;
     Toolbar toolbar;
@@ -24,7 +26,7 @@ public class PokemonListActivity extends AppCompatActivity implements SearchView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_pokemon_list);
 
         // Setup the toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -38,7 +40,7 @@ public class PokemonListActivity extends AppCompatActivity implements SearchView
         // Setup the recyclerview
         recyclerView = findViewById(R.id.PokemonListView);
         PokemonListModel pokemon = PokemonListModel.getHardCodedPokemonList();
-        adapter = new PokemonListAdapter(pokemon);
+        adapter = new PokemonListAdapter(pokemon, this);
         recyclerView.setAdapter(adapter);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -59,5 +61,12 @@ public class PokemonListActivity extends AppCompatActivity implements SearchView
     public boolean onQueryTextChange(String newText) {
         adapter.getFilter().filter(newText);
         return false;
+    }
+
+    @Override
+    public void onPokemonClick(PokemonModel poke) {
+        Intent intent = new Intent(this, PokemonDetailActivity.class);
+        intent.putExtra("pokemon", poke);
+        startActivity(intent);
     }
 }
