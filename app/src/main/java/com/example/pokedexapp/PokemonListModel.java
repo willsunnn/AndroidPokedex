@@ -3,7 +3,7 @@ package com.example.pokedexapp;
 import java.util.ArrayList;
 
 public class PokemonListModel {
-    private ArrayList<PokemonModel> pokemons;
+    private ArrayList<PokemonModel> pokemon;
 
     public static PokemonListModel getHardCodedPokemonList() {
         ArrayList<PokemonModel> pokemons = new ArrayList<PokemonModel>();
@@ -37,16 +37,20 @@ public class PokemonListModel {
         return new PokemonListModel(pokemons);
     }
 
-    public PokemonListModel(ArrayList<PokemonModel> pokemons) {
-        this.pokemons = pokemons;
+    public PokemonListModel(ArrayList<PokemonModel> pokemon) {
+        this.pokemon = pokemon;
+    }
+
+    public ArrayList<PokemonModel> getPokemonList() {
+        return this.pokemon;
     }
 
     public int getNumPokemon() {
-        return pokemons.size();
+        return pokemon.size();
     }
 
     public PokemonModel getPokemonAtIndex(int i) {
-        return pokemons.get(i);
+        return pokemon.get(i);
     }
 
 }

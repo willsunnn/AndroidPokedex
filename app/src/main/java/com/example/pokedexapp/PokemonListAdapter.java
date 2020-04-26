@@ -4,17 +4,26 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.PokemonViewHolder> {
-    private PokemonListModel pokemons;
+import java.util.ArrayList;
 
-    public PokemonListAdapter(PokemonListModel pokemons) {
-        this.pokemons = pokemons;
+public class PokemonListAdapter
+        extends RecyclerView.Adapter<PokemonListAdapter.PokemonViewHolder>
+        implements Filterable {
+
+    private PokemonListModel pokemon;
+    private PokemonListModel filteredPokemon;
+
+    public PokemonListAdapter(PokemonListModel pokemon) {
+        this.pokemon = pokemon;
+        this.filteredPokemon = pokemon;
     }
 
     @NonNull
@@ -29,16 +38,41 @@ public class PokemonListAdapter extends RecyclerView.Adapter<PokemonListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
-        PokemonModel pokemon = pokemons.getPokemonAtIndex(position);
-        holder.spriteView.setImageResource(pokemon.getSprite());
-        holder.nameView.setText("Name: "+pokemon.getName());
-        holder.levelView.setText("Level "+Integer.toString(pokemon.getLevel()));
-        holder.typeView.setText("Types: "+pokemon.getTypesAsString());
+        PokemonModel poke = filteredPokemon.getPokemonAtIndex(position);
+        holder.spriteView.setImageResource(poke.getSprite());
+        holder.nameView.setText("Name: "+poke.getName());
+        holder.levelView.setText("Level "+Integer.toString(poke.getLevel()));
+        holder.typeView.setText("Types: "+poke.getTypesAsString());
     }
 
     @Override
     public int getItemCount() {
-        return pokemons.getNumPokemon();
+        return filteredPokemon.getNumPokemon();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                ArrayList<PokemonModel> filtered = new ArrayList<PokemonModel>();
+                for(PokemonModel poke: pokemon.getPokemonList()) {
+                    if(poke.getName().toLowerCase().contains(constraint)) {
+                        filtered.add(poke);
+                    }
+                }
+                FilterResults results = new FilterResults();
+                results.values = filtered;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                filteredPokemon = new PokemonListModel((ArrayList<PokemonModel>) results.values);
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public class PokemonViewHolder extends RecyclerView.ViewHolder {
