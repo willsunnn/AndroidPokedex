@@ -23,7 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Name: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.5" />
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Pokemon Number: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toEndOf="@+id/NameView"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.5" />
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Weight: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/NameView"
                 app:layout_constraintWidth_percent="0.5" />
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="Height: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toEndOf="@+id/WeightView"
                 app:layout_constraintTop_toBottomOf="@+id/NumberView"
                 app:layout_constraintWidth_percent="0.5" />
@@ -67,7 +67,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="10dp"
                 android:text="Types: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/WeightView" />
 
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Moves: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/TypeView" />
 
@@ -95,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:text="Abilities: "
-                android:textSize="18dp"
+                android:textSize="16dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/MoveView" />
 

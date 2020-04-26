@@ -3,18 +3,19 @@ package com.example.pokedexapp;
 import android.os.Bundle;
 
 import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class PokemonDetailActivity extends AppCompatActivity {
+import java.util.HashMap;
+
+public class PokemonDetailActivity extends AppCompatActivity
+        implements PokemonMove.MoveModelUpdateListener, PokemonAbility.AbilityModelUpdateListener {
     PokemonModel pokemon;
 
     ImageView frontSprite;
@@ -26,8 +27,11 @@ public class PokemonDetailActivity extends AppCompatActivity {
     TextView heightView;
     TextView typeView;
 
-    LinearLayout movesView;
-    LinearLayout abilitiesView;
+    LinearLayout movesParentView;
+    LinearLayout abilitiesParentView;
+
+    HashMap<Integer,TextView> movesView;
+    HashMap<Integer,TextView> abilitiesView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +54,15 @@ public class PokemonDetailActivity extends AppCompatActivity {
         heightView = findViewById(R.id.HeightView);
         typeView = findViewById(R.id.TypeView);
 
-        movesView = findViewById(R.id.MoveView);
-        abilitiesView = findViewById(R.id.AbilityView);
+        movesParentView = findViewById(R.id.MoveView);
+        abilitiesParentView = findViewById(R.id.AbilityView);
 
         updateViewFromModel();
     }
 
     private void updateViewFromModel() {
-        frontSprite.setImageResource(pokemon.getFrontSprite());
-        backSprite.setImageResource(pokemon.getBackSprite());
+        Picasso.get().load(pokemon.getFrontSprite()).into(frontSprite);
+        Picasso.get().load(pokemon.getBackSprite()).into(backSprite);
 
         nameView.setText("Name: "+pokemon.getName());
         numberView.setText("Pokemon Number: "+Integer.toString(pokemon.getDexNumber()));
@@ -72,20 +76,48 @@ public class PokemonDetailActivity extends AppCompatActivity {
 
     private void updateMovesFromModel() {
         PokemonMove[] moves = pokemon.getMoves();
+        movesView = new HashMap<Integer, TextView>();
         for(PokemonMove move: moves) {
+            if(move.getMoveDescription().equals("")) {
+                move.registerMoveModelUpdateListener(this);
+                move.loadDescriptionFromApi();
+            }
             TextView moveView = new TextView(this);
             moveView.setText(move.getMoveName()+": "+move.getMoveDescription());
-            movesView.addView(moveView);
+            movesParentView.addView(moveView);
+            movesView.put(move.getMoveId(), moveView);
         }
     }
 
     private void updateAbilitiesFromModel() {
         PokemonAbility[] abilities = pokemon.getAbilities();
+        abilitiesView = new HashMap<Integer, TextView>();
         for(PokemonAbility ability: abilities) {
+            if(ability.getAbilityDescription().equals("")) {
+                ability.registerAbilityModelUpdateListener(this);
+                ability.loadDescriptionFromApi();
+            }
             TextView abilityView = new TextView(this);
             abilityView.setText(ability.getAbilityName()+": "+ability.getAbilityDescription());
-            abilitiesView.addView(abilityView);
+            abilitiesParentView.addView(abilityView);
+            abilitiesView.put(ability.getAbilityId(), abilityView);
         }
 
+    }
+
+    // Methods to handle asynchronous loading of data from the api
+
+    @Override
+    public void onMoveModelUpdate(PokemonMove move) {
+        TextView moveView = movesView.get(move.getMoveId());
+        moveView.setText(move.getMoveName()+": "+move.getMoveDescription());
+        move.removeMoveModelUpdateListener();
+    }
+
+    @Override
+    public void onAbilityModelUpdate(PokemonAbility ability) {
+        TextView abilityView = abilitiesView.get(ability.getAbilityId());
+        abilityView.setText(ability.getAbilityName()+": "+ability.getAbilityDescription());
+        ability.removeAbilityModelUpdateListener();
     }
 }

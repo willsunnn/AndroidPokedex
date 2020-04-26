@@ -2,32 +2,48 @@ package com.example.pokedexapp;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import java.util.Arrays;
 
 public class PokemonModel implements Parcelable {
-    public static final String API_CALL_URL = "https://pokeapi.co/api/v2/pokemon/";
+
+    public static final int DEFAULT_LEVEL = 10;
 
     private int dexNumber;
     private String name;
-    private PokemonType[] pokemonTypes;
+    private String[] pokemonTypes;
+    private PokemonMove[] pokemonMoves;
+    private PokemonAbility[] pokemonAbilities;
+    private int weight;
+    private int height;
+    private String frontSpriteURL;
+    private String backSpriteURL;
+    private int level;
 
-    public static PokemonModel getPokemonFromDexNumber(int dexNumber) throws Exception {
-        throw new Exception("this method hasn't been implemented yet");
-    }
-
-    public static String getApiCallUrl(int dexNumber) {
-        return API_CALL_URL + Integer.toString(dexNumber) + "/";
-    }
-
-    public PokemonModel(int dexNumber, String name, PokemonType[] pokemonTypes) {
+    public PokemonModel(int dexNumber, String name,
+                        String[] pokemonTypes,
+                        PokemonMove[] pokemonMoves,
+                        PokemonAbility[] pokemonAbilities,
+                        int weight,
+                        int height,
+                        String frontSprite,
+                        String backSprite,
+                        int level) {
         this.dexNumber = dexNumber;
         this.name = name;
         this.pokemonTypes = pokemonTypes;
+        this.pokemonMoves = pokemonMoves;
+        this.pokemonAbilities = pokemonAbilities;
+        this.weight = weight;
+        this.height = height;
+        this.frontSpriteURL = frontSprite;
+        this.backSpriteURL = backSprite;
+        this.level = level;
     }
 
     public String getName() {
-        return this.name;
+        return upperCaseFirstLetter(name);
     }
 
     public int getDexNumber() {
@@ -35,60 +51,46 @@ public class PokemonModel implements Parcelable {
     }
 
     public String getTypesAsString() {
-        String types = Arrays.toString(pokemonTypes);
-        return types.substring(1, types.length()-1);
+        String[] upperCaseTypes = new String[pokemonTypes.length];
+        for(int i=0; i<pokemonTypes.length; ++i) {
+            upperCaseTypes[i] = upperCaseFirstLetter(pokemonTypes[i]);
+        }
+        return TextUtils.join(", ", upperCaseTypes);
+    }
+
+    private String upperCaseFirstLetter(String s) {
+        if(s==null || s.equals("")){
+            return s;
+        }
+        return s.substring(0,1).toUpperCase()+s.substring(1);
     }
 
     public int getWeight() {
-        return -1;
+        return weight;
     }
 
     public int getHeight() {
-        return -1;
+        return height;
     }
 
-    public int getFrontSprite() {
-        return R.drawable.bulbasaur;
+    public String getFrontSprite() {
+        return frontSpriteURL;
     }
 
-    public int getBackSprite() {
-        return R.drawable.bulbasaur_back;
+    public String getBackSprite() {
+        return backSpriteURL;
     }
 
     public int getLevel() {
-        return 5;
+        return level;
     }
 
     public PokemonMove[] getMoves() {
-        return new PokemonMove[]{
-                new PokemonMove("Razor Leaf", "shoots leaves"),
-                new PokemonMove("Razor Leaf2", "shoots leaves"),
-                new PokemonMove("Razor Leaf3", "shoots leaves"),
-                new PokemonMove("Razor Leaf4", "shoots leaves"),
-                new PokemonMove("Razor Leaf5", "shoots leaves"),
-                new PokemonMove("Razor Leaf6", "shoots leaves"),
-                new PokemonMove("Razor Leaf7", "this one has a longer description hard coded in to test the text wrapping on the text view"),
-                new PokemonMove("Razor Leaf8", "shoots leaves"),
-                new PokemonMove("Razor Leaf9", "shoots leaves"),
-                new PokemonMove("Razor Leaf10", "shoots leaves"),
-                new PokemonMove("Razor Leaf11", "shoots leaves"),
-                new PokemonMove("Razor Leaf12", "shoots leaves"),
-                new PokemonMove("Razor Leaf13", "shoots leaves"),
-        };
+        return this.pokemonMoves;
     }
 
     public PokemonAbility[] getAbilities() {
-        return new PokemonAbility[]{
-                new PokemonAbility("Chlorophyll", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll2", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll3", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll4", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll5", "this one also has a longer description hard coded in to test the text warpping on the text view"),new PokemonAbility("Chlorophyll", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll6", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll7", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll8", "speed is raised in the sun"),
-                new PokemonAbility("Chlorophyll9", "speed is raised in the sun"),
-        };
+        return this.pokemonAbilities;
     }
 
     // Parcelable interface methods
@@ -96,14 +98,26 @@ public class PokemonModel implements Parcelable {
     protected PokemonModel(Parcel in) {
         dexNumber = in.readInt();
         name = in.readString();
-        pokemonTypes = in.createTypedArray(PokemonType.CREATOR);
+        pokemonTypes = in.createStringArray();
+        pokemonMoves = in.createTypedArray(PokemonMove.CREATOR);
+        pokemonAbilities = in.createTypedArray(PokemonAbility.CREATOR);
+        weight = in.readInt();
+        height = in.readInt();
+        frontSpriteURL = in.readString();
+        backSpriteURL = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(dexNumber);
         dest.writeString(name);
-        dest.writeTypedArray(pokemonTypes, flags);
+        dest.writeStringArray(pokemonTypes);
+        dest.writeTypedArray(pokemonMoves, flags);
+        dest.writeTypedArray(pokemonAbilities, flags);
+        dest.writeInt(weight);
+        dest.writeInt(height);
+        dest.writeString(frontSpriteURL);
+        dest.writeString(backSpriteURL);
     }
 
     @Override
@@ -122,85 +136,70 @@ public class PokemonModel implements Parcelable {
             return new PokemonModel[size];
         }
     };
-
-
-}
-
-class PokemonType implements Parcelable {
-    private String typeName;
-    private String url;
-
-    public PokemonType(String typeName, String infoUrl) {
-        this.typeName = typeName;
-        this.url = infoUrl;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public String toString() {
-        return typeName;
-    }
-
-    // Parcelable interface methods
-
-    protected PokemonType(Parcel in) {
-        typeName = in.readString();
-        url = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(typeName);
-        dest.writeString(url);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<PokemonType> CREATOR = new Creator<PokemonType>() {
-        @Override
-        public PokemonType createFromParcel(Parcel in) {
-            return new PokemonType(in);
-        }
-
-        @Override
-        public PokemonType[] newArray(int size) {
-            return new PokemonType[size];
-        }
-    };
 }
 
 class PokemonMove implements Parcelable {
     private String moveName;
+    private int moveId;
     private String moveDescription;
+    MoveModelUpdateListener listener;
 
-    public PokemonMove(String moveName, String moveDescription) {
+    public PokemonMove(String moveName, int moveId) {
         this.moveName = moveName;
-        this.moveDescription = moveDescription;
+        this.moveId = moveId;
+        this.moveDescription = "";
+        this.listener = null;
     }
 
     public String getMoveName() {
         return moveName;
     }
 
+    public int getMoveId() {
+        return moveId;
+    }
+
     public String getMoveDescription() {
         return moveDescription;
+    }
+
+    // Methods used to handle asynchronous loading of data from API
+
+    public void loadDescriptionFromApi() {
+        PokemonAPIManager.getMoveDescriptionFromId(this);
+    }
+
+    public void setDescription(String description) {
+        this.moveDescription = description;
+        if(this.listener != null) {
+            this.listener.onMoveModelUpdate(this);
+        }
+    }
+
+    public void registerMoveModelUpdateListener(MoveModelUpdateListener listener) {
+        this.listener = listener;
+    }
+
+    public void removeMoveModelUpdateListener() {
+        this.listener = null;
+    }
+
+    public interface MoveModelUpdateListener {
+        public void onMoveModelUpdate(PokemonMove move);
     }
 
     // Parcelable interface methods
 
     protected PokemonMove(Parcel in) {
         moveName = in.readString();
+        moveId = in.readInt();
         moveDescription = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(moveName);
+        dest.writeInt(moveId);
         dest.writeString(moveDescription);
     }
 
@@ -223,33 +222,68 @@ class PokemonMove implements Parcelable {
 }
 
 class PokemonAbility implements Parcelable {
-    private String name;
-    private String description;
+    private String abilityName;
+    private int abilityId;
+    private String abilityDescription;
+    private AbilityModelUpdateListener listener;
 
-    public PokemonAbility(String abilityName, String abilityDescription) {
-        this.name = abilityName;
-        this.description = abilityDescription;
+    public PokemonAbility(String abilityName, int abilityId) {
+        this.abilityName = abilityName;
+        this.abilityId = abilityId;
+        this.abilityDescription = "";
+        this.listener = null;
     }
 
     public String getAbilityName() {
-        return name;
+        return abilityName;
+    }
+
+    public int getAbilityId() {
+        return abilityId;
     }
 
     public String getAbilityDescription() {
-        return description;
+        return abilityDescription;
+    }
+
+    // Methods used to handle asynchronous loading of data from API
+
+    public void loadDescriptionFromApi() {
+        PokemonAPIManager.getAbilityDescriptionFromId(this);
+    }
+
+    public void setDescription(String description) {
+        this.abilityDescription = description;
+        if(this.listener != null) {
+            this.listener.onAbilityModelUpdate(this);
+        }
+    }
+
+    public void registerAbilityModelUpdateListener(AbilityModelUpdateListener listener) {
+        this.listener = listener;
+    }
+
+    public void removeAbilityModelUpdateListener() {
+        this.listener = null;
+    }
+
+    public interface AbilityModelUpdateListener {
+        public void onAbilityModelUpdate(PokemonAbility ability);
     }
 
     // Parcelable interface methods
 
     protected PokemonAbility(Parcel in) {
-        name = in.readString();
-        description = in.readString();
+        abilityName = in.readString();
+        abilityId = in.readInt();
+        abilityDescription = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(description);
+        dest.writeString(abilityName);
+        dest.writeInt(abilityId);
+        dest.writeString(abilityDescription);
     }
 
     @Override

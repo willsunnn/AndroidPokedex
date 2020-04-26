@@ -4,41 +4,19 @@ import java.util.ArrayList;
 
 public class PokemonListModel {
     private ArrayList<PokemonModel> pokemon;
+    private ListModelUpdateListener listener;
 
-    public static PokemonListModel getHardCodedPokemonList() {
-        ArrayList<PokemonModel> pokemons = new ArrayList<PokemonModel>();
-        pokemons.add(new PokemonModel(
-                1, "Bulbasaur",
-                new PokemonType[]{
-                        new PokemonType("grass", "insert url here"),
-                        new PokemonType("poison", "insert url here"),
-                }));
-        pokemons.add(new PokemonModel(
-                4, "Charmander",
-                new PokemonType[]{new PokemonType("fire", "insert url here")}));
-        pokemons.add(new PokemonModel(
-                7, "Squirtle",
-                new PokemonType[]{new PokemonType("water", "insert url here")}));
-        pokemons.add(new PokemonModel(
-                25, "Pikachu",
-                new PokemonType[]{new PokemonType("electric", "insert url here")}));
-        pokemons.add(new PokemonModel(
-                147, "Dratini",
-                new PokemonType[]{new PokemonType("dragon", "insert url here")}));
-        pokemons.add(new PokemonModel(
-                66, "Machop",
-                new PokemonType[]{new PokemonType("fighting", "insert url here")}));
-        pokemons.add(new PokemonModel(
-                92, "Ghastly",
-                new PokemonType[]{
-                        new PokemonType("ghost", "insert url here"),
-                        new PokemonType("poison", "insert url here")
-                }));
-        return new PokemonListModel(pokemons);
+    public static PokemonListModel getPokemonList(int[] dexNumbers) {
+        PokemonListModel model = new PokemonListModel(new ArrayList<PokemonModel>());
+        for(int dexNumber: dexNumbers) {
+            PokemonAPIManager.getPokemonFromDexNumber(model, dexNumber);
+        }
+        return model;
     }
 
     public PokemonListModel(ArrayList<PokemonModel> pokemon) {
         this.pokemon = pokemon;
+        this.listener = null;
     }
 
     public ArrayList<PokemonModel> getPokemonList() {
@@ -53,4 +31,20 @@ public class PokemonListModel {
         return pokemon.get(i);
     }
 
+    // Methods used to handle asynchronous loading of data from API
+
+    public void addPokemonToList(PokemonModel poke) {
+        pokemon.add(poke);
+        if(this.listener != null) {
+            this.listener.onListModelUpdate(this);
+        }
+    }
+
+    public void registerListModelUpdateListener(ListModelUpdateListener listener) {
+        this.listener = listener;
+    }
+
+    interface ListModelUpdateListener {
+        public void onListModelUpdate(PokemonListModel model);
+    }
 }

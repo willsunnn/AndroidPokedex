@@ -12,19 +12,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 public class PokemonListAdapter
         extends RecyclerView.Adapter<PokemonListAdapter.PokemonViewHolder>
-        implements Filterable {
+        implements Filterable, PokemonListModel.ListModelUpdateListener {
 
     private PokemonListModel pokemon;
     private PokemonListModel filteredPokemon;
+    private String searchString;
     private OnPokemonClickListener pokemonClickListener;
 
     public PokemonListAdapter(PokemonListModel pokemon, OnPokemonClickListener pokemonClickListener) {
         this.pokemon = pokemon;
+        pokemon.registerListModelUpdateListener(this);
         this.filteredPokemon = pokemon;
+        this.searchString = "";
         this.pokemonClickListener = pokemonClickListener;
     }
 
@@ -41,7 +46,7 @@ public class PokemonListAdapter
     @Override
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         PokemonModel poke = filteredPokemon.getPokemonAtIndex(position);
-        holder.spriteView.setImageResource(poke.getFrontSprite());
+        Picasso.get().load(poke.getFrontSprite()).into(holder.spriteView);
         holder.nameView.setText("Name: "+poke.getName());
         holder.levelView.setText("Level "+Integer.toString(poke.getLevel()));
         holder.typeView.setText("Types: "+poke.getTypesAsString());
@@ -51,32 +56,6 @@ public class PokemonListAdapter
     public int getItemCount() {
         return filteredPokemon.getNumPokemon();
     }
-
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                ArrayList<PokemonModel> filtered = new ArrayList<PokemonModel>();
-                for(PokemonModel poke: pokemon.getPokemonList()) {
-                    if(poke.getName().toLowerCase().contains(constraint)) {
-                        filtered.add(poke);
-                    }
-                }
-                FilterResults results = new FilterResults();
-                results.values = filtered;
-                return results;
-            }
-
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                filteredPokemon = new PokemonListModel((ArrayList<PokemonModel>) results.values);
-                notifyDataSetChanged();
-            }
-        };
-    }
-
     public class PokemonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         OnPokemonClickListener pokemonClickListener;
 
@@ -105,6 +84,42 @@ public class PokemonListAdapter
 
     public interface OnPokemonClickListener {
         void onPokemonClick(PokemonModel pokemon);
+    }
+
+    // Filterable interface
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                ArrayList<PokemonModel> filtered = new ArrayList<PokemonModel>();
+                searchString = constraint.toString().toLowerCase();
+                for(PokemonModel poke: pokemon.getPokemonList()) {
+                    if(poke.getName().toLowerCase().contains(searchString)) {
+                        filtered.add(poke);
+                    }
+                }
+                FilterResults results = new FilterResults();
+                results.values = filtered;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                filteredPokemon = new PokemonListModel((ArrayList<PokemonModel>) results.values);
+                notifyDataSetChanged();
+            }
+        };
+    }
+
+    // PokemonListModel.ModelUpdateListener interface
+
+    @Override
+    public void onListModelUpdate(PokemonListModel model) {
+        // a new PokemonModel has been added, so it should re-render the list and filter it
+        this.getFilter().filter(searchString);
     }
 
 }
