@@ -1,5 +1,21 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Item" />
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/hamburger_icon"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/random_team_item"
+                android:title="@string/random_team_item_text" />
+
+            <item
+                android:id="@+id/hello_pokemon_item"
+                android:title="Enable/Disable Beacon App" />
+        </menu>
+    </item>
 
 </menu>

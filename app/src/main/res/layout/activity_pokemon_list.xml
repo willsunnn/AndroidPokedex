@@ -21,7 +21,10 @@
             android:id="@+id/pokemon_list_search"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:title="@string/action_search" />
+            android:foregroundTint="#FFFFFF"
+            android:title="@string/action_search"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="4dp" />
 
     </androidx.appcompat.widget.Toolbar>
 

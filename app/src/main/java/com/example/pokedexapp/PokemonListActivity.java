@@ -1,21 +1,32 @@
 package com.example.pokedexapp;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class PokemonListActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener,  PokemonListAdapter.OnPokemonClickListener {
+
+    PokemonListModel pokemon;
     PokemonListAdapter adapter;
     RecyclerView recyclerView;
     Toolbar toolbar;
@@ -32,7 +43,7 @@ public class PokemonListActivity extends AppCompatActivity
         setContentView(R.layout.activity_pokemon_list);
 
         // Setup the model
-        PokemonListModel pokemon = getRandomPokemon(7,1,151);
+        pokemon = getRandomPokemon();
 
         // Setup the toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -54,6 +65,36 @@ public class PokemonListActivity extends AppCompatActivity
                 recyclerView.getContext(),
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(divider);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id) {
+            case R.id.random_team_item:
+                pokemon = getRandomPokemon();
+                adapter = new PokemonListAdapter(pokemon, this);
+                recyclerView.setAdapter(adapter);
+                return true;
+            case R.id.hello_pokemon_item:
+                PokemonModel poke = this.pokemon.getRandomPokemon();
+                createAlertDialog(poke);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void createAlertDialog(PokemonModel poke) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        final View view = inflater.inflate(R.layout.pokemon_alert_dialog, null);
+        builder.setView(view);
+        builder.show();
+        ImageView image = view.findViewById(R.id.alert_dialog_image);
+        TextView text = view.findViewById(R.id.alert_dialog_text);
+        Picasso.get().load(poke.getFrontSprite()).into(image);
+        text.setText("Hello "+poke.getName()+"!");
     }
 
     // SearchView.OnQueryTextListener interface
@@ -81,6 +122,10 @@ public class PokemonListActivity extends AppCompatActivity
     }
 
     // Methods for getting random pokemon
+
+    private PokemonListModel getRandomPokemon() {
+        return getRandomPokemon(7,1,151);
+    }
 
     private PokemonListModel getRandomPokemon(int numPokemon, int lowerBoundDex, int upperBoundDex) {
         return PokemonListModel.getPokemonList(getDifferentRandomNums(numPokemon, lowerBoundDex, upperBoundDex));

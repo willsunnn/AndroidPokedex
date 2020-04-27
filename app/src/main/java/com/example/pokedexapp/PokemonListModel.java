@@ -31,6 +31,11 @@ public class PokemonListModel {
         return pokemon.get(i);
     }
 
+    public PokemonModel getRandomPokemon() {
+        int index = (int) (Math.random()*getNumPokemon());
+        return getPokemonAtIndex(index);
+    }
+
     // Methods used to handle asynchronous loading of data from API
 
     public void addPokemonToList(PokemonModel poke) {
