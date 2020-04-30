@@ -3,7 +3,7 @@ This is my first android app that I had made through visual studio code. It is a
 
 ## Demo of the App
 
-![App Demo](demo_files/app_demo.gif)
+<img src="demo_files/app_demo.gif" height="800px">
 
 ## Build/Run the App
 1. Clone the repository
